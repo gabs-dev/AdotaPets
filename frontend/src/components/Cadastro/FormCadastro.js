@@ -13,6 +13,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Copyright from '../Copyright';
+import CatBackground from '../../assets/images/cat.png';
+import PageTitle from '../../hooks/PageTitle';
 
 const theme = createTheme();
 
@@ -26,6 +28,7 @@ function FormCadastro() {
         });
     };
 
+    PageTitle("Criar conta - AdotaPets")
     return (
         <ThemeProvider theme={theme}>
             <Grid container component="main" sx={{ height: '100vh' }}>
@@ -36,7 +39,7 @@ function FormCadastro() {
                     sm={4}
                     md={7}
                     sx={{
-                        backgroundImage: 'url(https://source.unsplash.com/random)',
+                        backgroundImage: `url(${CatBackground})`,
                         backgroundRepeat: 'no-repeat',
                         backgroundColor: (t) =>
                             t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
@@ -58,7 +61,7 @@ function FormCadastro() {
                             <LockOutlinedIcon />
                         </Avatar>
                         <Typography component="h1" variant="h5">
-                            Sign in
+                            Crie a sua conta
                         </Typography>
                         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
                             <TextField
@@ -118,20 +121,8 @@ function FormCadastro() {
                                 variant="contained"
                                 sx={{ mt: 3, mb: 2 }}
                             >
-                                Entrar
+                                Criar Conta
                             </Button>
-                            <Grid container>
-                                <Grid item xs>
-                                    <Link href="#" variant="body2">
-                                        Forgot password?
-                                    </Link>
-                                </Grid>
-                                <Grid item>
-                                    <Link href="#" variant="body2">
-                                        {"Don't have an account? Sign Up"}
-                                    </Link>
-                                </Grid>
-                            </Grid>
                             <Copyright sx={{ mt: 5 }} />
                         </Box>
                     </Box>

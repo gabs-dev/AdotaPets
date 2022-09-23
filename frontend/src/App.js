@@ -1,11 +1,10 @@
 import './App.css';
-//import FormLogin from './components/Login/FormLogin';
-import FormCadastro from './components/Cadastro/FormCadastro';
+import Routes from './routes/routes';
 
 function App() {
   return (
     <div className="App">
-      <FormCadastro />
+      <Routes />
     </div>
   );
 }
