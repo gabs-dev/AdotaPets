@@ -23,7 +23,6 @@ public class UserDto {
         this.id = user.getId();
         this.nome = user.getNome();
         this.email = user.getEmail();
-        this.senha = user.getSenha();
         this.cnpj = user.getCnpj();
         this.bloqueado = user.isBloqueado();
     }
