@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -14,6 +15,10 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Copyright from '../Copyright';
 import CatBackground from '../../assets/images/cat.png';
 import PageTitle from '../../hooks/PageTitle';
+import api from "../../api/api";
+import Snackbar from '@mui/material/Snackbar';
+import Slide from '@mui/material/Slide';
+import { Alert } from '@mui/material';
 
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -23,24 +28,120 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 const theme = createTheme();
 
 function FormCadastro() {
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
+    const headers = {
+        'Content-Type': 'application/json'
     };
 
-    const [cgcNumber, setCgcNumber] = React.useState('');
+    const snackbarProps = {
+        open: false,
+        severity: "info",
+        message: '',
+    }
+
+    const userData = {
+        nome: '',
+        email: '',
+        senha: '',
+        cnpj: ''
+    };
+
+    const [user, setUser] = useState(userData);
+    const [snackbar, setSnackbar] = useState(snackbarProps);
+    const [confirmarSenha, setConfirmarSenha] = useState();
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway')
+            return;
+
+        snackbarProps.open = false;
+        setSnackbar(snackbarProps)
+    }
+
+    const handleOpen = (snackbarPro) => {
+        setSnackbar(snackbarProps);
+    }
 
     const handleChange = (event) => {
-        setCgcNumber(event.target.value);
+        event.preventDefault();
+        const { name, value } = event.target;
+
+        setUser({ ...user, [name]: value })
+    }
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        if (confirmarSenha != user.senha) {
+            configureSnackbar(0, 'Senhas diferentes!');
+            return;
+        }
+        console.log(JSON.stringify(user));
+        await api
+            .put("/usuario", JSON.stringify(user), {
+                headers: headers
+            })
+            .then(response => {
+                configureSnackbar(response.status);
+                console.log(response.status)
+            })
+            .catch(err =>
+                configureSnackbar(err.response.status)
+            )
     };
+
+    const configureSnackbar = (status, mensagem) => {
+        snackbarProps.open = true;
+        if (status === 201) {
+            snackbarProps.message = 'Cadastro realizado com sucesso!';
+            snackbarProps.severity = 'success';
+        } else if (status === 0) {
+            snackbarProps.message = mensagem;
+            snackbarProps.severity = 'error';
+        } else {
+            snackbarProps.message = 'Erro! Não foi possivel cadastrar o usuário.';
+            snackbarProps.severity = 'error';
+        }
+
+        handleOpen(snackbarProps);
+    }
+
+
+    /*
+        const handleSubmit = (event) => {
+            event.preventDefault();
+            const data = new FormData(event.currentTarget);
+            console.log({
+                email: data.get('email'),
+                password: data.get('password'),
+            });
+        };
+    
+        const [cgcNumber, setCgcNumber] = React.useState('');
+    
+        const handleChange = (event) => {
+            setCgcNumber(event.target.value);
+        };
+    */
+
 
     PageTitle("Criar conta - AdotaPets")
     return (
         <ThemeProvider theme={theme}>
+            <Snackbar
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                autoHideDuration={3000}
+                open={snackbar.open}
+                onClose={handleClose}
+                TransitionComponent={Slide}
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity={snackbar.severity}
+                    sx={{ width: '100%' }}
+                    variant="filled"
+                >
+                    {snackbar.message}
+                </Alert>
+            </Snackbar>
             <Grid container component="main" sx={{ height: '100vh' }}>
                 <CssBaseline />
                 <Grid
@@ -75,11 +176,12 @@ function FormCadastro() {
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="name"
+                                id="nome"
                                 label="Nome"
-                                name="name"
-                                autoComplete="name"
+                                name="nome"
+                                autoComplete="nome"
                                 autoFocus
+                                onChange={handleChange}
                             />
                             <TextField
                                 margin="normal"
@@ -88,48 +190,53 @@ function FormCadastro() {
                                 id="email"
                                 label="Email"
                                 name="email"
+                                type="email"
                                 autoComplete="email"
                                 autoFocus
+                                onChange={handleChange}
                             />
                             <TextField
                                 margin="normal"
                                 required
                                 fullWidth
-                                name="password"
+                                name="senha"
                                 label="Senha"
                                 type="password"
-                                id="password"
+                                id="senha"
                                 autoComplete="current-password"
+                                onChange={handleChange}
                             />
                             <TextField
                                 margin="normal"
                                 required
                                 fullWidth
-                                name="password"
+                                name="confirmarSenha"
                                 label="Confirmar Senha"
                                 type="password"
-                                id="password"
+                                id="confirmarSenha"
                                 autoComplete="current-password"
+                                onChange={(e) => setConfirmarSenha(e.target.value)}
                             />
                             <TextField
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="codRegis"
+                                id="cnpj"
                                 label="CNPJ/CPF"
-                                name="codRegis"
-                                autoComplete="codRegis"
+                                name="cnpj"
+                                autoComplete="cnpj"
                                 autoFocus
+                                onChange={handleChange}
                             />
 
-                            <FormControl fullWidth >
+                            <FormControl fullWidth style={{ display: 'none' }}>
                                 <InputLabel id="demo-simple-select-label">Tipo Usuário</InputLabel>
                                 <Select
                                     labelId="demo-simple-select-label"
                                     id="demo-simple-select"
-                                    value={cgcNumber}
-                                    //label="Age"
-                                    onChange={handleChange}
+                                //value={cgcNumber}
+                                //label="Age"
+                                //onChange={handleChange}
                                 >
                                     <MenuItem value={10}>Pessoa Física</MenuItem>
                                     <MenuItem value={20}>Pessoa Jurídica </MenuItem>
