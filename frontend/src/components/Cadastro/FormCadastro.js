@@ -16,6 +16,11 @@ import Copyright from '../Copyright';
 import CatBackground from '../../assets/images/cat.png';
 import PageTitle from '../../hooks/PageTitle';
 
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+
 const theme = createTheme();
 
 function FormCadastro() {
@@ -26,6 +31,12 @@ function FormCadastro() {
             email: data.get('email'),
             password: data.get('password'),
         });
+    };
+
+    const [cgcNumber, setCgcNumber] = React.useState('');
+
+    const handleChange = (event) => {
+        setCgcNumber(event.target.value);
     };
 
     PageTitle("Criar conta - AdotaPets")
@@ -114,7 +125,21 @@ function FormCadastro() {
                                 autoComplete="codRegis"
                                 autoFocus
                             />
-                            
+
+                            <FormControl fullWidth >
+                                <InputLabel id="demo-simple-select-label">Tipo Usuário</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    value={cgcNumber}
+                                    //label="Age"
+                                    onChange={handleChange}
+                                >
+                                    <MenuItem value={10}>Pessoa Física</MenuItem>
+                                    <MenuItem value={20}>Pessoa Jurídica </MenuItem>
+                                </Select>
+                            </FormControl>
+
                             <Button
                                 type="submit"
                                 fullWidth
