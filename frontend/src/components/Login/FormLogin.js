@@ -1,35 +1,113 @@
 import * as React from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-//import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Snackbar from '@mui/material/Snackbar';
+import Slide from '@mui/material/Slide';
+import { Alert } from '@mui/material';
+
 import Copyright from '../Copyright';
 import DogBackground from '../../assets/images/dog.png';
 import PageTitle from '../../hooks/PageTitle';
 
+import api from "../../api/api";
+
 const theme = createTheme();
 
 export default function FormLogin() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+  const headers = {
+    'Content-Type': 'application/json'
   };
+
+  const snackbarProps = {
+    open: false,
+    severity: "info",
+    message: '',
+  }
+
+  const userData = {
+    email: '',
+    senha: ''
+  };
+
+  const [user, setUser] = useState(userData);
+  const [snackbar, setSnackbar] = useState(snackbarProps);
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway')
+      return;
+    
+    snackbarProps.open = false;
+    setSnackbar(snackbarProps)
+  }
+
+  const handleOpen = (snackbarPro) => {
+    setSnackbar(snackbarProps);
+  }
+
+  const handleChange = (event) => {
+    event.preventDefault();
+    const { name, value } = event.target;
+
+    setUser({ ...user, [name]: value })
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    await api
+      .post("/login", JSON.stringify(user), {
+        headers: headers
+      })
+      .then(response => {
+        configureSnackbar(response.status);
+      })
+      .catch(err => 
+        configureSnackbar(err.response.status)
+      )
+  };
+
+  const configureSnackbar = (status) => {
+    snackbarProps.open = true;
+    if (status === 200) {
+      snackbarProps.message = 'Login realizado com sucesso!';
+      snackbarProps.severity = 'success';
+    } else {
+      snackbarProps.message = 'Erro! Usuário ou senha inválidos.';
+      snackbarProps.severity = 'error';
+    }
+
+    handleOpen(snackbarProps);
+  }
 
   PageTitle("Login - AdotaPets")
   return (
     <ThemeProvider theme={theme}>
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        autoHideDuration={3000}
+        open={snackbar.open}
+        onClose={handleClose}
+        TransitionComponent={Slide}
+      >
+        <Alert
+          onClose={handleClose}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+          variant="filled"
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
@@ -59,7 +137,7 @@ export default function FormLogin() {
             <Typography component="h1" variant="h5">
               Faça o login
             </Typography>
-            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+            <Box component="form" noValidate={false} onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
                 required
@@ -68,32 +146,36 @@ export default function FormLogin() {
                 label="Usuário"
                 name="email"
                 autoComplete="email"
+                type="email"
                 autoFocus
+                onChange = {handleChange}
               />
               <TextField
                 margin="normal"
                 required
                 fullWidth
-                name="password"
+                name="senha"
                 label="Senha"
                 type="password"
-                id="password"
+                id="senha"
                 autoComplete="current-password"
+                onChange = {handleChange}
               />
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
+                style={{ backgroundColor: "#0288D1"}}
               >
                 Login
               </Button>
-              <Grid container>
-                {/*<Grid item xs>
-                  <Link href="#" variant="body2">
+              <Grid container style={{ textAlign: 'left' }}>
+                <Grid item xs>
+                  <Link to="#" variant="body2">
                     Esqueceu sua senha?
                   </Link>
-          </Grid>*/}
+                </Grid>
                 <Grid item>
                   <Link to="/criarConta" variant="body2">
                     {"Não possui conta? Clique aqui"}
