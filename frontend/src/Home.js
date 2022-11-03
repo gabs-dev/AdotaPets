@@ -1,17 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+import NavBar from './components/Navbar/NavBar';
+import FormCadastrarPet from './components/Pet/FormCadastrarPet'
+
 const Home = () => {
   return (
     <div>
-      <h1>Página Inicial</h1>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/login">Login</Link>
-          </li>
-        </ul>
-      </nav>
+      <NavBar />
+      <FormCadastrarPet />
     </div>
   );
 }

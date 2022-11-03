@@ -20,6 +20,8 @@ import Snackbar from '@mui/material/Snackbar';
 import Slide from '@mui/material/Slide';
 import { Alert } from '@mui/material';
 
+import { useNavigate } from 'react-router-dom';
+
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -74,55 +76,37 @@ function FormCadastro() {
             configureSnackbar(0, 'Senhas diferentes!');
             return;
         }
-        console.log(JSON.stringify(user));
         await api
             .put("/usuario", JSON.stringify(user), {
                 headers: headers
             })
             .then(response => {
                 configureSnackbar(response.status);
-                console.log(response.status)
             })
             .catch(err =>
                 configureSnackbar(err.response.status)
             )
     };
 
+    const navigate = useNavigate();
+
     const configureSnackbar = (status, mensagem) => {
         snackbarProps.open = true;
         if (status === 201) {
             snackbarProps.message = 'Cadastro realizado com sucesso!';
             snackbarProps.severity = 'success';
+            navigate('/login');
         } else if (status === 0) {
             snackbarProps.message = mensagem;
             snackbarProps.severity = 'error';
         } else {
-            snackbarProps.message = 'Erro! Não foi possivel cadastrar o usuário.';
+            snackbarProps.message = 'Erro! Não foi possível cadastrar o usuário.';
             snackbarProps.severity = 'error';
         }
 
         handleOpen(snackbarProps);
     }
-
-
-    /*
-        const handleSubmit = (event) => {
-            event.preventDefault();
-            const data = new FormData(event.currentTarget);
-            console.log({
-                email: data.get('email'),
-                password: data.get('password'),
-            });
-        };
     
-        const [cgcNumber, setCgcNumber] = React.useState('');
-    
-        const handleChange = (event) => {
-            setCgcNumber(event.target.value);
-        };
-    */
-
-
     PageTitle("Criar conta - AdotaPets")
     return (
         <ThemeProvider theme={theme}>
@@ -192,7 +176,6 @@ function FormCadastro() {
                                 name="email"
                                 type="email"
                                 autoComplete="email"
-                                autoFocus
                                 onChange={handleChange}
                             />
                             <TextField
@@ -225,7 +208,6 @@ function FormCadastro() {
                                 label="CNPJ/CPF"
                                 name="cnpj"
                                 autoComplete="cnpj"
-                                autoFocus
                                 onChange={handleChange}
                             />
 

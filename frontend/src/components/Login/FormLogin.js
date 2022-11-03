@@ -16,11 +16,15 @@ import Snackbar from '@mui/material/Snackbar';
 import Slide from '@mui/material/Slide';
 import { Alert } from '@mui/material';
 
+import { useNavigate } from 'react-router-dom';
+
 import Copyright from '../Copyright';
 import DogBackground from '../../assets/images/dog.png';
 import PageTitle from '../../hooks/PageTitle';
 
 import api from "../../api/api";
+import authService from "../../services/authService";
+import { waitFor } from '@testing-library/react';
 
 const theme = createTheme();
 
@@ -69,18 +73,23 @@ export default function FormLogin() {
         headers: headers
       })
       .then(response => {
-        configureSnackbar(response.status);
+        configureSnackbar(response);
       })
       .catch(err => 
-        configureSnackbar(err.response.status)
+        configureSnackbar(err.response)
       )
   };
 
-  const configureSnackbar = (status) => {
+  const navigate = useNavigate();
+
+  const configureSnackbar = (response) => {
     snackbarProps.open = true;
-    if (status === 200) {
+    const user = response.data.data;
+    if (response.status === 200) {
       snackbarProps.message = 'Login realizado com sucesso!';
       snackbarProps.severity = 'success';
+      authService.setLoggedUser(user);
+      navigate('/');
     } else {
       snackbarProps.message = 'Erro! Usuário ou senha inválidos.';
       snackbarProps.severity = 'error';
