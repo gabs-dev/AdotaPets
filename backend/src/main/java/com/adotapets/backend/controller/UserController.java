@@ -22,7 +22,7 @@ public class UserController {
 
     @PutMapping
     public ResponseEntity<Object> create(@RequestBody UserForm userForm) {
-        UserDto user = userService.createUser(userForm);
+        UserDto user = userService.saveUser(userForm);
         HttpStatus status = user != null ? HttpStatus.CREATED : HttpStatus.MULTI_STATUS;
         return ResponseHandler.generateResponse("", status, user);
     }

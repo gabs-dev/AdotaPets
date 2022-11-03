@@ -1,9 +1,12 @@
 package com.adotapets.backend.model;
-
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,7 +30,8 @@ public class User {
     private String senha;
 
     @Column(name = "DataCadastro", nullable = false)
-    private Date dataCadastro;
+    @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm:ss")
+    private LocalDateTime dataCadastro;
 
     @Lob
     @Column(name = "FotoPerfil")
@@ -38,5 +42,9 @@ public class User {
 
     @Column(name = "Bloqueado")
     private boolean bloqueado;
+
+    @OneToMany(mappedBy = "responsavel", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Pet> pets;
 
 }
